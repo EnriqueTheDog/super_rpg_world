@@ -1,0 +1,47 @@
+create database RPGWORLD
+
+create table Worlds (
+id int not null primary key identity(1, 1),
+corruption int not null,
+WorldName nvarchar(30)
+)
+
+create table Players (
+PlayerName nvarchar(20) not null primary key,
+PlayerLevel int not null,
+St int,
+Intel int,
+Cr int,
+Rs int,
+Age int,
+LifeTime int,
+LongLife int,
+Gender nvarchar(1),
+Race nvarchar(20),
+Class nvarchar(20),
+cure bit,
+fury bit,
+meditate bit,
+vampire bit,
+HpMax int,
+HpTotal int,
+ManaMax int,
+ManaTotal int,
+XpMax int,
+XpTotal int,
+)
+
+create table Inventory (
+id int not null primary key identity(1, 1),
+potion int
+)
+
+create table SavedGames (
+Id int not null primary key identity(1,1),
+PlayerId nvarchar(20) not null,
+foreign key(PlayerId) references Players (PlayerName),
+inventoryId int,
+foreign key(InventoryId) references Inventory(id),
+WorldId int,
+foreign key(WorldID) references Worlds(id)
+)
