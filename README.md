@@ -6,8 +6,9 @@ enjoy
 
 ----Still working on----
 
-randomized attacks and spells
-weapons!
-bosses
-shops with potions and other stuff
-classes
+-- randomized attacks and spells
+-- weapons!
+-- bosses
+-- shops with potions and other stuff
+-- classes
+-- english version
