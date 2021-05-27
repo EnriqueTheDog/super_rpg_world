@@ -14,11 +14,7 @@ namespace super_rpg_world
         public int[] Hp = new int[2];
         public bool PhRes = false;
         public bool MgRes = false;
-
-        public static void Baptize()
-        {
-            
-        }
+        public int reduct = 0;
 
         //Mob construction only requires a base level (based on the world's current corruption)
         public Mob(int lvl)
@@ -27,7 +23,7 @@ namespace super_rpg_world
             int lev = lvl * (lvl / 2 + lvl % 2) - lvl / 2;
 
             this.St = lev + random.Next((lev - lev/3), (lev + lev/5));
-            this.Hp[0] = lev + random.Next((lev - lev / 3), (lev + lev / 2));
+            this.Hp[0] = lev + random.Next((lev + lev / 3), (lev*2));
             this.Hp[1] = this.Hp[0];
             this.Xp = lev + (lvl / 2 + lvl % 2);
 
@@ -47,7 +43,17 @@ namespace super_rpg_world
 
         public int Attack()
         {
-            return random.Next(this.St - this.St / 5, this.St + this.St / 5);
+            int dmg = St - reduct;
+            return random.Next(dmg - dmg / 5, dmg + dmg / 5);
+        }
+
+        //Returns false when no more reduction is allowed
+        public bool TakeDiscourse(int dmg)
+        {
+            if (reduct >= St * 0.3) { return false; }
+            reduct = dmg;
+            if (reduct >= St * 0.3) { reduct = Convert.ToInt32(St * 0.3); }
+            return true;
         }
 
         public int TakeDmg(int q, bool magic)

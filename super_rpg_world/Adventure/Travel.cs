@@ -46,21 +46,32 @@ namespace super_rpg_world
                     break;
                 case 4:
                     //Save and Go
-                    if (!Program.Player.existent)
+                    if (Program.SuccesfulConnection)
                     {
-                        SavedGames.SaveNew();
-                        Boxy Save = new Boxy("Se ha guardado una nueva partida", 1, 0, 5, true);
-                        Console.ReadKey();
-                        Console.Clear();
-                        return false;
+                        if (!Program.Player.existent)
+                        {
+                            SavedGames.SaveNew();
+                            Boxy Save = new Boxy("Se ha guardado una nueva partida", 1, 0, 5, true);
+                            Console.ReadKey();
+                            Console.Clear();
+                            return false;
+                        }
+                        else
+                        {
+                            SavedGames.Rewrite();
+                            Boxy Rewrite = new Boxy("Se han sobreescrito los datos guardados", 1, 0, 5, true);
+                            Console.ReadKey();
+                            Console.Clear();
+                            return false;
+                        }
                     }
                     else
                     {
-                        SavedGames.Rewrite();
-                        Boxy Rewrite = new Boxy("Se han sobreescrito los datos guardados", 1, 0, 5, true);
+                        System.Threading.Thread.Sleep(2000);
+                        Boxy Rewrite = new Boxy("No se ha podido conectar con la base de datos :S", 1, 0, 5, true);
                         Console.ReadKey();
                         Console.Clear();
-                        return false;
+                        return true;
                     }
                     break;
             }

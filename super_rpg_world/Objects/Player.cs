@@ -54,10 +54,10 @@ namespace super_rpg_world
             LongLife = 0;
             Race = "humano";
             Class = "";
-            St = 1;
-            In = 1;
-            Cr = 1;
-            Rs = 2;
+            St = 5;
+            In = 4;
+            Rs = 3;
+            Cr = 2;
 
             Crit = 1;
 
@@ -78,7 +78,7 @@ namespace super_rpg_world
             {
                 Console.Clear();
                 Boxy NameBoxy = new Boxy("Introduce el nombre de tu personaje", 2, 0, 5, true);
-                newName = NameBoxy.ReadLine();
+                newName = NameBoxy.ReadLine(20);
                 NameBoxy.Erase();
                 if (newName.Length <= 0)
                 {
@@ -87,7 +87,7 @@ namespace super_rpg_world
                     invalidName = true;
 
                 }
-                else if (SavedGames.CheckPlayerName(newName))
+                else if (Program.SuccesfulConnection && SavedGames.CheckPlayerName(newName))
                 {
                     NameBoxy = new Boxy("Ya existe una partida guardada con este nombre", 1, 0, 5, true);
                     Console.ReadKey();

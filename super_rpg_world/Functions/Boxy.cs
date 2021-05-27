@@ -278,7 +278,7 @@ namespace super_rpg_world
         //    }
         //}
 
-        public string ReadLine()
+        public string ReadLine(int max)
         {
             Locate();
             ConsoleKeyInfo read;
@@ -290,11 +290,11 @@ namespace super_rpg_world
                 {
                     break;
                 }
-                else if (output.Length < 20 && Char.IsLetter(Convert.ToChar(read.Key))) { output += Convert.ToString(read.Key); }
-                else if (output.Length < 20 && read.Key == ConsoleKey.Spacebar)
+                else if (output.Length < max && read.Key == ConsoleKey.Spacebar)
                 {
                     output += Convert.ToChar(read.Key);
                 }
+                else if (output.Length < max && char.IsLetter(read.KeyChar)) { output += Convert.ToString(read.Key); }
                 else if (output.Length > 0 && read.Key == ConsoleKey.Backspace)
                 {
                     //Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);

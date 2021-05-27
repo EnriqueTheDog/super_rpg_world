@@ -8,7 +8,23 @@ namespace super_rpg_world
 
     public class SavedGames
     {
-        List<Game> AllGames = new List<Game>();
+        public List<Game> AllGames = new List<Game>();
+        public static SqlConnection connection;
+
+        public static void Connect(string root)
+        {
+
+            try
+            {
+                connection = new SqlConnection($"Data source={root}; Initial Catalog=RPGWORLD; integrated security=true");
+            }
+            catch
+            {
+                Console.WriteLine("No se pudo conectar con la base de datos");
+                Console.ReadKey();
+            }
+
+        }
 
         public static void SaveNew()
         {
@@ -20,18 +36,18 @@ namespace super_rpg_world
             string NewSavedGame = $"INSERT INTO SavedGames(PlayerID, inventoryId, WorldId) values((SELECT TOP 1 PlayerName FROM Players ORDER BY PlayerName DESC), (SELECT TOP 1 Id FROM Inventory ORDER BY Id DESC), (SELECT TOP 1 Id FROM Worlds ORDER BY Id DESC))";
 
             
-            SqlCommand sendPlayer = new SqlCommand(savingPlayer, Program.connection);
-            SqlCommand sendInv = new SqlCommand(savingInv, Program.connection);
-            SqlCommand sendWorld = new SqlCommand(savingWorld, Program.connection);
-            SqlCommand sendNewGame = new SqlCommand(NewSavedGame, Program.connection);
-            Program.connection.Open();
+            SqlCommand sendPlayer = new SqlCommand(savingPlayer, connection);
+            SqlCommand sendInv = new SqlCommand(savingInv, connection);
+            SqlCommand sendWorld = new SqlCommand(savingWorld, connection);
+            SqlCommand sendNewGame = new SqlCommand(NewSavedGame, connection);
+            connection.Open();
             //PELIGRO CON CLAVE DUPLICADA (SqlException)
             sendPlayer.ExecuteNonQuery();
             sendInv.ExecuteNonQuery();
             sendWorld.ExecuteNonQuery();
             System.Threading.Thread.Sleep(1000);
             sendNewGame.ExecuteNonQuery();
-            Program.connection.Close();
+            connection.Close();
             
         }
 
@@ -83,8 +99,8 @@ namespace super_rpg_world
         public static List<Game> GetAll()
         {
             string getAll = $"SELECT Id FROM SavedGames";
-            SqlCommand getGames = new SqlCommand(getAll, Program.connection);
-            Program.connection.Open();
+            SqlCommand getGames = new SqlCommand(getAll, connection);
+            connection.Open();
             SqlDataReader reader = getGames.ExecuteReader();
 
             List<int> Finds = new List<int>();
@@ -94,7 +110,7 @@ namespace super_rpg_world
                 Finds.Add(Convert.ToInt32(reader[0]));
             }
 
-            Program.connection.Close();
+            connection.Close();
 
             List<Game> LoadedGames = new List<Game>();
 
@@ -111,8 +127,8 @@ namespace super_rpg_world
         {
             Player load = new Player();
             string getAll = $"SELECT Players.* FROM SavedGames LEFT JOIN Players ON (SELECT PlayerId FROM SavedGames WHERE id = {gameId})=Players.PlayerName";
-            SqlCommand getGames = new SqlCommand(getAll, Program.connection);
-            Program.connection.Open();
+            SqlCommand getGames = new SqlCommand(getAll, connection);
+            connection.Open();
             SqlDataReader reader = getGames.ExecuteReader();
             while (reader.Read())
             {
@@ -141,7 +157,7 @@ namespace super_rpg_world
                 break;
             }
 
-            Program.connection.Close();
+            connection.Close();
             return load;
         }
         
@@ -149,8 +165,8 @@ namespace super_rpg_world
         {
             Inventory load = new Inventory();
             string getAll = $"SELECT Inventory.* FROM SavedGames LEFT JOIN Inventory ON (SELECT InventoryId FROM SavedGames WHERE id = {gameId})=Inventory.Id";
-            SqlCommand getGames = new SqlCommand(getAll, Program.connection);
-            Program.connection.Open();
+            SqlCommand getGames = new SqlCommand(getAll, connection);
+            connection.Open();
             SqlDataReader reader = getGames.ExecuteReader();
             while (reader.Read())
             {
@@ -158,7 +174,7 @@ namespace super_rpg_world
                 load.Potion.quantity = Convert.ToInt32(reader[1]);              
                 break;
             }
-            Program.connection.Close();
+            connection.Close();
 
             return load;
         }
@@ -167,8 +183,8 @@ namespace super_rpg_world
         {
             World load = new World();
             string getAll = $"SELECT Worlds.* FROM SavedGames LEFT JOIN Worlds ON (SELECT WorldId FROM SavedGames WHERE id = {gameId})=Worlds.id";
-            SqlCommand getGames = new SqlCommand(getAll, Program.connection);
-            Program.connection.Open();
+            SqlCommand getGames = new SqlCommand(getAll, connection);
+            connection.Open();
             SqlDataReader reader = getGames.ExecuteReader();
             while (reader.Read())
             {
@@ -176,7 +192,7 @@ namespace super_rpg_world
                 load.corruption = Convert.ToInt32(reader[1]);
                 break;
             }
-            Program.connection.Close();
+            connection.Close();
 
             return load;
         }
@@ -187,14 +203,14 @@ namespace super_rpg_world
             string savingInv = $"UPDATE Inventory SET Potion = {Program.Inventory.Potion.quantity} WHERE Id = {Program.Inventory.Id}";
             string savingWorld = $"UPDATE Worlds SET corruption = {Program.Gea.corruption} WHERE Id = {Program.Gea.Id}";
 
-            SqlCommand sendPlayer = new SqlCommand(rwPlayer, Program.connection);
-            SqlCommand sendInv = new SqlCommand(savingInv, Program.connection);
-            SqlCommand sendWorld = new SqlCommand(savingWorld, Program.connection);
-            Program.connection.Open();
+            SqlCommand sendPlayer = new SqlCommand(rwPlayer, connection);
+            SqlCommand sendInv = new SqlCommand(savingInv, connection);
+            SqlCommand sendWorld = new SqlCommand(savingWorld, connection);
+            connection.Open();
             sendPlayer.ExecuteNonQuery();
             sendInv.ExecuteNonQuery();
             sendWorld.ExecuteNonQuery();
-            Program.connection.Close();
+            connection.Close();
 
         }
 
@@ -216,30 +232,30 @@ namespace super_rpg_world
             string delWorld = $"DELETE Worlds WHERE Id = {Program.Gea.Id}";
             string delGame = $"DELETE SavedGames WHERE PlayerID = '{Program.Player.Name}'";
 
-            SqlCommand sendPlayer = new SqlCommand(delPlayer, Program.connection);
-            SqlCommand sendInv = new SqlCommand(delInv, Program.connection);
-            SqlCommand sendWorld = new SqlCommand(delWorld, Program.connection);
-            SqlCommand sendGame = new SqlCommand(delGame, Program.connection);
-            Program.connection.Open();
+            SqlCommand sendPlayer = new SqlCommand(delPlayer, connection);
+            SqlCommand sendInv = new SqlCommand(delInv, connection);
+            SqlCommand sendWorld = new SqlCommand(delWorld, connection);
+            SqlCommand sendGame = new SqlCommand(delGame, connection);
+            connection.Open();
             sendGame.ExecuteNonQuery();
             sendPlayer.ExecuteNonQuery();
             sendInv.ExecuteNonQuery();
             sendWorld.ExecuteNonQuery();
-            Program.connection.Close();
+            connection.Close();
         }
 
         public static bool CheckPlayerName(string newPlayer)
         {
             List<string> players = new List<string>();
             string getAll = $"SELECT PlayerName FROM Players";
-            SqlCommand getGames = new SqlCommand(getAll, Program.connection);
-            Program.connection.Open();
+            SqlCommand getGames = new SqlCommand(getAll, connection);
+            connection.Open();
             SqlDataReader reader = getGames.ExecuteReader();
             while (reader.Read())
             {
                 players.Add(reader[0].ToString());              
             }
-            Program.connection.Close();
+            connection.Close();
 
             foreach (string playerName in players)
             {

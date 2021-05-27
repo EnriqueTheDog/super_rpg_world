@@ -12,7 +12,6 @@ namespace super_rpg_world
 {
     class Program
     {
-        static public SqlConnection connection = new SqlConnection("Data source=PC-CATALINA\\SQLEXPRESS; Initial Catalog=RPGWORLD; integrated security=true");
 
 
         
@@ -32,7 +31,7 @@ namespace super_rpg_world
         static public World Gea;
         static bool gameover = false;
 
-
+        public static bool SuccesfulConnection = false;
 
 
 
@@ -50,6 +49,9 @@ namespace super_rpg_world
             //    Console.ReadKey();
             //}
 
+            //Connection to database
+            //INSERT HERE YOUR DATABASE PATH
+            SavedGames.Connect("THIS-PC\\SQLEXPRESS");
 
 
             Console.SetWindowSize(Console.LargestWindowWidth, Console.LargestWindowHeight);
@@ -60,8 +62,24 @@ namespace super_rpg_world
             //Game Bucle
             while (1 < 2)
             {
+
                 //First of all - Loading savedgames list
-                List<Game> Games = SavedGames.GetAll();
+                List<Game> Games = new List<Game>();
+                
+
+                try
+                {
+                Games = SavedGames.GetAll();
+                SuccesfulConnection = true;
+                }
+                catch
+                {
+                    Boxy dBError = new Boxy(22, 13, 0, true, "No se ha podido conectar con la base de datos. Las funciones de carga y de guardado no estarán disponibles");
+                    Console.ReadKey();
+                    Console.Clear();
+                    
+                }
+
                 //StartMenu - false load, true new Player
                 if (StartMenu(Games))
                 {
@@ -291,10 +309,18 @@ namespace super_rpg_world
                     case "d":
                         Combat.Erase();
                         //discurso
-                        Mob.St -= Player.Discourse();
+                        if (Mob.TakeDiscourse(Player.Discourse()))
+                        {
                         Boxy MD = new Boxy(22, 0, true, "Le echas una buena bronca. Se ha reducido su agresividad.");
-                        Console.ReadKey();
-                        MD.Erase();
+                            Console.ReadKey();
+                            MD.Erase();
+                        }
+                        else
+                        {
+                            Boxy MD = new Boxy(22, 0, true, "La bestia ya no atiende a razones");
+                            Console.ReadKey();
+                            MD.Erase();
+                        }
                         break;
                     case "i":
                         Combat.Erase();
@@ -416,7 +442,7 @@ namespace super_rpg_world
             while (!exit)
             {
                 StartMenu.Erase();
-                switch (StartMenu.Read(new string[] { "Nueva partida", "Cargar Partida", "Salón de la Fama", "Salir" }, "Hola!", 18))
+                switch (StartMenu.Read(new string[] { "Nueva partida", "Cargar Partida", "Salón de la Fama", "Conectar BDD local", "Salir" }, "Hola!", 18))
                 {
                     case 0:
                         exit = true;
@@ -432,6 +458,30 @@ namespace super_rpg_world
                         noMsn.Erase();
                         break;
                     case 3:
+                        Boxy NameBoxy = new Boxy("Introduce la dirección de la BDD (ejemplo 'THIS-PC\\SQLEXPRESS'", 2, 0, 5, true);
+                        string url = Console.ReadLine();
+                        SavedGames.Connect(url);
+
+                        try
+                        {
+                            Games = SavedGames.GetAll();
+                            SuccesfulConnection = true;
+                            Boxy dBError = new Boxy(22, 13, 0, true, "Conectado a la base de datos con éxito!");
+                            Console.ReadKey();
+                            dBError.Erase();
+                        }
+                        catch
+                        {
+                            Boxy dBError = new Boxy(22, 13, 0, true, "No se ha podido conectar con la base de datos. Las funciones de carga y de guardado no estarán disponibles");
+                            Console.ReadKey();
+                            Console.Clear();
+                            dBError.Erase();
+
+                        }
+
+                        NameBoxy.Erase();
+                        break;
+                    case 4:
                         Console.Clear();
                         Boxy thanks = new Boxy(12, 0, true, "Gracias por jugar :')");
                         Console.ReadKey();
